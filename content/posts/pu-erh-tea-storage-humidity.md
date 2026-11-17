@@ -1,4 +1,6 @@
 ---
+cover: "/assets/img/pu-erh-tea-storage-humidity.jpg"
+cover_alt: "Pu-erh tea cakes stored on wooden shelves."
 title: "Pu-erh Tea Storage: Humidity, Temperature And Contamination Risk"
 slug: "pu-erh-tea-storage-humidity"
 date: "2026-11-18"
