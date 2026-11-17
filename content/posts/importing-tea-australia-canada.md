@@ -1,4 +1,6 @@
 ---
+cover: "/assets/img/importing-tea-australia-canada.jpg"
+cover_alt: "Open map with a tea sample, indicating export markets."
 title: "Importing Tea To Australia and Canada: Quick Standard Overview"
 slug: "importing-tea-australia-canada"
 date: "2026-11-18"
