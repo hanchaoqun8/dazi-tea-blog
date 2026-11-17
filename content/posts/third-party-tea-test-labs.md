@@ -1,4 +1,6 @@
 ---
+cover: "/assets/img/third-party-tea-test-labs.jpg"
+cover_alt: "Quiet laboratory corridor with a lab coat on a hook."
 title: "What Is A Third-Party Tea Test? Eurofins, NSF And Independent Labs"
 slug: "third-party-tea-test-labs"
 date: "2026-11-18"
