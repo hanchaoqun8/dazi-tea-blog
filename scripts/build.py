@@ -92,7 +92,8 @@ def render_markdown(md):
     return "\n".join(out)
 
 # ---------- page templates ----------
-def layout(title, description, content, body_class=""):
+def layout(title, description, content, body_class="", og_image=""):
+    og_img_tag = f'<meta property="og:image" content="{html.escape(og_image)}">' if og_image else ""
     return f"""<!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -102,6 +103,7 @@ def layout(title, description, content, body_class=""):
 <meta property="og:description" content="{html.escape(description)}">
 <meta property="og:type" content="website">
 <meta property="og:url" content="{SITE_URL}/">
+{og_img_tag}
 <link rel="stylesheet" href="/assets/style.css">
 <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
 </head><body class="{body_class}">
@@ -134,12 +136,9 @@ def cat_slug(c):
     return re.sub(r"[^a-z0-9]+", "-", c.lower()).strip("-")
 
 def build():
-    if os.path.exists(SITE_DIR):
-        shutil.rmtree(SITE_DIR)
+    # Overwrite in place instead of rmtree: safe on sandboxes and preview-locked dirs.
+    os.makedirs(SITE_DIR, exist_ok=True)
     os.makedirs(os.path.join(SITE_DIR, "assets"), exist_ok=True)
-    shutil.copy(os.path.join(ROOT, "site", "assets", "style.css"),
-                os.path.join(SITE_DIR, "assets", "style.css")) if os.path.exists(
-                    os.path.join(ROOT, "site", "assets", "style.css")) else None
     # ensure style copied from source location (docs/source kept in scripts dir too)
     src_css = os.path.join(ROOT, "scripts", "style.css")
     if os.path.exists(src_css):
@@ -156,7 +155,11 @@ def build():
     cards = []
     for p in posts:
         m = p["meta"]
+        cover = m.get("cover", "")
+        cover_alt = m.get("cover_alt", m.get("title", ""))
+        thumb = (f'<img class="card-img" src="{html.escape(cover)}" alt="{html.escape(cover_alt)}" loading="lazy">' if cover else "")
         cards.append(f"""<article class="card">
+  {thumb}
   <div class="card-cat">{html.escape(m.get('category',''))}</div>
   <h2><a href="/posts/{m['slug']}/">{html.escape(m['title'])}</a></h2>
   <p>{html.escape(m.get('description',''))}</p>
@@ -192,16 +195,21 @@ def build():
         # remove the H1 from body if present (we render it ourselves)
         body_html = re.sub(r"<h1>.*?</h1>", "", body_html, count=1)
         tags = " ".join(f'<span class="tag">{html.escape(t)}</span>' for t in m.get("tags", []))
+        cover = m.get("cover", "")
+        cover_alt = m.get("cover_alt", m.get("title", ""))
+        cover_html = (f'<figure class="post-cover"><img src="{html.escape(cover)}" alt="{html.escape(cover_alt)}"></figure>' if cover else "")
         content = f"""<article class="post">
 <div class="post-cat">{html.escape(m.get('category',''))} · {p['date']}</div>
 <h1>{html.escape(m['title'])}</h1>
 <div class="tags">{tags}</div>
+{cover_html}
 <div class="post-body">{body_html}</div>
 </article>"""
         d = os.path.join(SITE_DIR, "posts", slug)
         os.makedirs(d, exist_ok=True)
+        og = (SITE_URL + cover) if cover.startswith("/") else cover
         with open(os.path.join(d, "index.html"), "w", encoding="utf-8") as f:
-            f.write(layout(m["title"], m.get("description", ""), content, "post-page"))
+            f.write(layout(m["title"], m.get("description", ""), content, "post-page", og_image=og))
 
     # sitemap
     urls = [SITE_URL + "/"] + [SITE_URL + "/category/" + cat_slug(c) + "/" for c in cats] \
