@@ -1,4 +1,6 @@
 ---
+cover: "/assets/img/organic-vs-conventional-tea-residue.jpg"
+cover_alt: "Two styles of dried tea leaves compared on linen."
 title: "Organic Tea vs Conventional Tea: Residue Test Differences"
 slug: "organic-vs-conventional-tea-residue"
 date: "2026-11-18"
