@@ -1,4 +1,6 @@
 ---
+cover: "/assets/img/tea-labeling-rules-us-health-claims.jpg"
+cover_alt: "Applying a label to a tea pouch, text unreadable."
 title: "Tea Labeling Rules In The US: Health Claims You Cannot Make"
 slug: "tea-labeling-rules-us-health-claims"
 date: "2026-11-18"
