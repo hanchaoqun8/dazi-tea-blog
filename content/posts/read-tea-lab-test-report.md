@@ -1,4 +1,6 @@
 ---
+cover: "/assets/img/read-tea-lab-test-report.jpg"
+cover_alt: "Finger pointing at results on a printed laboratory report."
 title: "How To Read A Tea Lab Test Report (Pesticides & Heavy Metals)"
 slug: "read-tea-lab-test-report"
 date: "2026-11-18"
