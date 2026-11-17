@@ -1,0 +1,83 @@
+# 每日海外茶资讯 · 自动抓取 → 本地化改写 → 合规体检 → 重建站点 → 部署
+# 完全在 GitHub Actions 云端运行，不依赖本地开机。
+# 每天 UTC 00:00（北京时间 08:00）产出 1 篇英文文章，部署到 Cloudflare Pages。
+#
+# 上线前需在仓库 Settings → Secrets and variables → Actions 配置：
+#   CLOUDFLARE_API_TOKEN   — Cloudflare API Token（Account 权限: Pages:Edit）
+#   CLOUDFLARE_ACCOUNT_ID  — Cloudflare Account ID
+# 可选（启用 LLM 高质量改写；不配则用内置模板化改写，同样合规）：
+#   LLM_API_KEY  /  LLM_BASE_URL  /  LLM_MODEL
+
+name: Daily Tea News Post
+
+on:
+  schedule:
+    - cron: '0 0 * * *'        # UTC 00:00 = 北京 08:00
+  workflow_dispatch:           # 支持 GitHub 页面手动点运行
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-tea-news
+  cancel-in-progress: false
+
+jobs:
+  daily:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 1. Fetch overseas tea news (official sources)
+        run: python scripts/fetch_news.py
+
+      - name: 2. Localize one item into an English article
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_BASE_URL: ${{ secrets.LLM_BASE_URL }}
+          LLM_MODEL: ${{ secrets.LLM_MODEL }}
+        run: python scripts/write_post.py
+
+      - name: 3. Compliance check (health claims / invented data / structure)
+        run: python scripts/validate.py
+
+      - name: 4. Build static site
+        run: python scripts/build.py
+
+      - name: Preview queue & post count
+        run: |
+          echo "Posts: $(ls content/posts/*.md | wc -l)"
+          echo "Site files: $(find site -type f | wc -l)"
+
+      - name: 5. Deploy to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          npm_config_registry=https://registry.npmjs.org npx --yes wrangler@4 pages deploy site \
+            --project-name=dazi-tea-blog \
+            --branch=main \
+            --commit-dirty=true
+
+      - name: 6. Commit generated article + site (留痕)
+        continue-on-error: true
+        run: |
+          git config user.name "tea-ledger-bot"
+          git config user.email "bot@dazi-tea-blog.local"
+          git add content/posts site scripts/news_queue.json
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Daily tea news post $(date -u +%F)"
+            git pull --rebase origin main
+            git push origin main
+          fi
