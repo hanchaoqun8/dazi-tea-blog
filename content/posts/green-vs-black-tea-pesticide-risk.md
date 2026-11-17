@@ -1,4 +1,6 @@
 ---
+cover: "/assets/img/green-vs-black-tea-pesticide-risk.jpg"
+cover_alt: "Green and black tea brewed side by side."
 title: "Green Tea vs Black Tea: Pesticide Test Risk Comparison"
 slug: "green-vs-black-tea-pesticide-risk"
 date: "2026-11-18"
