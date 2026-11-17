@@ -1,4 +1,6 @@
 ---
+cover: "/assets/img/tea-batch-testing-limits.jpg"
+cover_alt: "One tea sample bag marked among several unmarked bags."
 title: "Tea Batch Testing: Why One Good Test Does Not Guarantee All Stock"
 slug: "tea-batch-testing-limits"
 date: "2026-11-18"
