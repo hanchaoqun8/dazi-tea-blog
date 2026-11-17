@@ -1,4 +1,6 @@
 ---
+cover: "/assets/img/when-tea-fails-eu-inspection.jpg"
+cover_alt: "Sealed cartons of tea in a warehouse."
 title: "What Happens When Tea Fails EU Pesticide Inspection"
 slug: "when-tea-fails-eu-inspection"
 date: "2026-11-18"
