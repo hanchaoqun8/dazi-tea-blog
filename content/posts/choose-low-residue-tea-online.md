@@ -1,4 +1,6 @@
 ---
+cover: "/assets/img/choose-low-residue-tea-online.jpg"
+cover_alt: "Buyer comparing tea samples at a desk."
 title: "How To Choose Low-Residue Chinese Tea Online"
 slug: "choose-low-residue-tea-online"
 date: "2026-11-18"
