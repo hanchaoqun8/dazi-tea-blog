@@ -1,4 +1,6 @@
 ---
+cover: "/assets/img/eu-default-limit-0-01-mg-kg.jpg"
+cover_alt: "Blurred test result slip with a tea sample and calculator."
 title: "Pesticide Default Limit 0.01mg/kg In EU Tea Rules"
 slug: "eu-default-limit-0-01-mg-kg"
 date: "2026-11-18"
