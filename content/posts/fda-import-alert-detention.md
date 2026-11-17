@@ -1,4 +1,6 @@
 ---
+cover: "/assets/img/fda-import-alert-detention.jpg"
+cover_alt: "Worker inspecting detained tea cartons in a warehouse."
 title: "Tea Import Alert: Understanding FDA Detention Notices"
 slug: "fda-import-alert-detention"
 date: "2026-11-18"
