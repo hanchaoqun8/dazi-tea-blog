@@ -1,0 +1,487 @@
+================================================================================
+部落格配圖產生方案｜blog.dazi.uk
+The Tea Ledger — 28 篇英文茶葉合規文章配圖完整方案
+版本 v1.0　日期 2026-11-18
+================================================================================
+
+本文件包含三大部分：
+　第一部分：整體視覺原則（如何做出「自然真實感」）
+　第二部分：主站 dazi.uk 現成素材複用清單（可直接引用，免生成）
+　第三部分：28 篇文章逐篇配圖方案（每篇含繁中 + English 雙版提示詞）
+附錄：技術參數、ALT 文字、社群分發、檔案命名與上架流程
+
+--------------------------------------------------------------------------------
+第一部分　整體視覺原則：什麼是「自然真實感」
+--------------------------------------------------------------------------------
+
+目標：照片看起來像攝影師在真實茶山、真實倉庫、真實實驗室裡拍的，
+　　　不像 AI 生成圖、不像攝影棚擺拍、不像卡通插畫。
+
+【一定要有的特質】
+1. 真實光線：自然光為主。清晨柔光、窗邊散射光、單一光源＋柔和陰影。
+   避免五顏六色的補光、避免均勻打亮的「證件照光」。
+2. 真實材質：可見茶葉纖維、棉紙紋理、陶土氣孔、木桌刮痕、灰塵微粒。
+   细节要有「不完美」——茶葉有碎末、紙張有褶皺、手有指紋。
+3. 真實景深：淺景深（f/2.0–f/4.0 感），主體清晰、背景自然虛化。
+   不要全圖銳利（那是 AI 味最重的特徵之一）。
+4. 真實色彩：低飽和、暖灰綠色調、米白背景。茶湯是琥珀／青綠，
+   不是螢光綠或艷黃。整体接近紀實攝影的「胶片和缓感」。
+5. 真實構圖：稍微不對稱、留白、環境敘事（人在做事、工具在旁），
+   不要完美居中的「產品目錄照」。
+6. 有人味的線索：一雙手、半杯茶、翻開的報告、使用痕跡——
+   但不要露出可信度低的「文字」（AI 生成文字通常亂碼，見下）。
+
+【一定要避免（负向提示詞通用段，每張圖都加）】
+　過度飽和、螢光色、塑膠感、3D CG、卡通、插畫、漫畫、水彩渲染、
+　對稱證件照、完美無瑕、亂碼文字、浮水印、假logo、變形手指、
+　多指、長指甲、油亮皮膚、拼接痕跡、魚眼變形、HDR 過曝。
+
+【統一的畫面基調（貫穿 28 篇）】
+　色溫：晨光偏暖 4800–5600K；實驗室場景偏中性 5000–6500K。
+　色調：live documentary photography, muted earthy tones, soft natural light,
+　　　　shallow depth of field, film-like gentle grain, no stylization.
+　畫幅：文章封面 16:9 或 3:2；Pinterest 直版 2:3；IG 方形 1:1 或 4:5。
+
+--------------------------------------------------------------------------------
+第二部分　主站 dazi.uk 現成素材複用清單（優先使用，免生成）
+--------------------------------------------------------------------------------
+
+下列素材已在主站上，品質與「自然真實感」調性一致，可直接引用絕對網址。
+用法：在文章 front matter 加 cover 欄位，build.py 會自動帶入（見附錄）。
+
+素材 A｜晨霧古茶園空拍（1080×720，見 hero-garden.jpg）
+　URL：https://dazi.uk/wp-content/themes/dazhi-tea/assets/img/hero-garden.jpg
+　內容：層疊茶山、晨霧、樹木、遠山，深綠暖灰，真實空拍。
+　適合文章：
+　　#1  EU MRLs 入門（源頭：茶園是殘留起點）
+　　#8  Regulation 396/2005（產地視角）
+　　#16 重金屬來源：土壤與水
+　　#19 綠茶 vs 紅茶（同園不同製法）
+　　#21 GB vs EU 標準（中國產地）
+　　#28 合規清單（首圖／尾圖皆可）
+
+素材 B｜普洱生茶餅特寫（900×560）
+　URL：https://dazi.uk/wp-content/uploads/2026/10/dazhi-cake-sheng-900x560.jpg
+　內容：棉紙包茶餅、單一窗光、散茶，米褐背景。
+　適合：#15 普洱儲存、#18 陳化能否去農殘、#20 選低殘留茶。
+
+素材 C｜普洱熟茶餅特寫（900×560）
+　URL：https://dazi.uk/wp-content/uploads/2026/10/dazhi-cake-shu-900x560.jpg
+　適合：#15、#18（對比生／熟），#23 霉菌與儲存。
+
+素材 D｜單株茶餅特寫（900×560）
+　URL：https://dazi.uk/wp-content/uploads/2026/10/dazhi-cake-danzhu-900x560.jpg
+　適合：#11 有機 vs 常規（樹齡／來源故事），#20 選茶指南。
+
+素材 E｜社群分享封面 share-cover.jpg（尺寸較小，僅作備用）
+　URL：https://dazi.uk/wp-content/themes/dazhi-tea/assets/img/share-cover.jpg
+　適合：Pinterest／IG 備用底圖，不建議作文章主圖。
+
+※ 其餘 22 篇涉及實驗室、報告、海關、標籤、倉庫等主題，
+　主站沒有合適素材，請用第三部分提示詞生成。
+
+--------------------------------------------------------------------------------
+第三部分　28 篇文章逐篇配圖方案（繁中 + English 雙版提示詞）
+--------------------------------------------------------------------------------
+
+【提示詞使用說明】
+・「繁中版」給即夢、通義萬相、Midjourney 中文介面等使用。
+・「English 版」給 Midjourney / Stable Diffusion / DALL·E 使用。
+・每則都已含【自然真實感】要求與【通用負向詞】的法則，
+　若你的工具支援 negative prompt，請把該篇的「負向」欄整段貼上。
+・尺寸建議：文章封面先用 1536×1024（3:2）或 1344×768（16:9）。
+
+--------------------------------------------------------------------------------
+【01】What Are EU MRLs for Tea?（EU MRLs 入門）
+　素材：可直接用主站素材 A（晨霧茶園）。
+　新圖提示詞（可選，作為內文圖）：
+　繁中：清晨薄霧中的真實茶園梯田，茶樹葉片帶露珠，自然側光，
+　　　　攝影師蹲在低角度拍攝，淺景深，低飽和暖綠色調，紀實攝影風格，
+　　　　真實枝葉 texture，no text, no people in focus。
+　　　　負向：過度飽和、卡通、插畫、3D、AI 感、亂碼文字、浮水印。
+　EN: Documentary photograph of misty tea terraces at dawn, dew on real tea
+　　　leaves, low-angle handheld shot, soft side light, shallow depth of field,
+　　　muted warm green palette, subtle film grain, authentic foliage texture,
+　　　no text, no watermark, no illustration, no 3D render, no oversaturation.
+　ALT: Tea plantation at dawn with mist over rows of tea bushes.
+
+【02】Does "Zero Pesticide Residue" Mean...（零農殘迷思）
+　繁中：一雙真實的手拿著放大鏡，檢查一把散茶葉片，桌面是舊木桌，
+　　　　窗邊自然光，可見茶葉絨毛與碎末，真實指尖與指紋，淺景深，
+　　　　紀實攝影，低飽和，嚴肅誠實的氛圍，no text, no watermark。
+　　　　負向：完美無瑕、塑膠感、過度打光、卡通、變形手指。
+　EN: Close documentary photo of real hands examining dried tea leaves with a
+　　　magnifying glass on a worn wooden table, window daylight, visible leaf
+　　　fibers and fine dust, natural fingers with realistic skin texture, shallow
+　　　depth of field, muted earthy tones, honest investigative mood, no text,
+　　　no watermark. Negative: plastic skin, extra fingers, cartoon, studio lighting.
+　ALT: Inspecting dried tea leaves with a magnifying glass.
+
+【03】FDA Tea Import Rules（FDA 進口規則）
+　繁中：真實的紙箱與出口文件放在堆疊的貨運木棧板上，背景是港口貨櫃，
+　　　　陰天自然光，文件有折痕、訂書針，牛皮紙箱有使用痕跡，紀實風格，
+　　　　淺景深，冷灰色調但不過冷，no readable text, no logo。
+　　　　負向：亂碼文字、鮮豔色、3D、證件照式打光。
+　EN: Documentary photo of brown shipping cartons and paper documents on a
+　　　wooden pallet near a port, overcast natural light, creased paper, visible
+　　　staples and used cardboard texture, shipping containers softly blurred in
+　　　background, shallow depth of field, muted industrial tones, no readable
+　　　text, no logos. Negative: gibberish text, bright colors, 3D render.
+　ALT: Tea shipment documents and cartons on a pallet at a port.
+
+【04】How To Read A Tea Lab Test Report（讀檢測報告）
+　繁中：真實的檢測報告影本放在木桌上，旁邊有一杯茶與一支原子筆，
+　　　　手指指著表格數據，窗光斜射，紙張纖維與油墨真實，報告文字不可辨識，
+　　　　淺景深，暖灰色調，紀實攝影，no readable text, no brand。
+　　　　負向：亂碼文字、完美白紙、螢光筆色、卡通。
+　EN: Candid close-up of a printed lab report on a wooden desk, a person's finger
+　　　pointing at a row of results, a pen and a cup of tea beside it, angled window
+　　　light, real paper fiber and ink texture, unreadable blurred text, shallow
+　　　depth of field, warm grey documentary style, no readable text, no brand.
+　　　Negative: gibberish text, pristine paper, neon highlighter, illustration.
+　ALT: Finger pointing at results on a printed laboratory report.
+
+【05】Common Pesticides Causing EU Rejection（農殘拒收）
+　繁中：實驗室移液槍正在把液體滴入樣本瓶，藍色手套，白色實驗台，
+　　　　真實玻璃反光與液滴，中性光，紀實攝影，淺景深，
+　　　　冷淨但不過度明亮，no text, no brand logo。
+　　　　負向：科幻感、霓虹、3D、過度飽和、亂碼標籤。
+　EN: Documentary lab photo of a pipette adding liquid into a sample vial,
+　　　blue nitrile gloves, clean white bench, real glass reflections and droplets,
+　　　neutral light, shallow depth of field, restrained cool tone, no readable
+　　　text, no brand. Negative: sci-fi, neon, 3D, oversaturation, gibberish labels.
+　ALT: Lab technician using a pipette on a tea sample.
+
+【06】FSVP For Tea Importers（FSVP 供應商驗證）
+　繁中：茶葉供應商檔案夾與筆記本攤開在桌上，旁邊放著樣本茶罐，
+　　　　真實紙張與手寫筆跡（不可辨識），自然側光，淺景深，暖棕色调，
+　　　　紀實攝影，no readable text, no logo。
+　　　　負向：整齊到假、過度打光、卡通、亂碼文字。
+　EN: Documentary still life of an open supplier file folder and notebook on a
+　　　desk beside a sample tea tin, real paper and illegible handwriting,
+　　　natural side light, shallow depth of field, warm brown tones, no readable
+　　　text, no logo. Negative: overly staged, flat studio light, cartoon, gibberish.
+　ALT: Supplier verification documents beside a tea sample tin.
+
+【07】Lead and Arsenic In Tea（重金屬與檢測）
+　繁中：真實的實驗室天平上放著少量茶葉樣本，防靜電罩半開，
+　　　　金属反光真實，操作者手在旁，中性光，淺景深，
+　　　　冷灰紀實攝影，no text, no brand。
+　　　　負向：科幻、全息、霓虹、3D、過度銳利。
+　EN: Close documentary photo of a small tea sample on an analytical balance
+　　　under a half-open draft shield, real metal reflections, a technician's hand
+　　　nearby, neutral light, shallow depth of field, cool grey documentary tone,
+　　　no text, no brand. Negative: sci-fi, hologram, neon, 3D, over-sharpened.
+　ALT: Tea sample weighed on a laboratory analytical balance.
+
+【08】EU Regulation 396/2005（歐盟法案）
+　素材：主站素材 A（茶園）可直接用。
+　新圖提示詞：
+　繁中：真實茶園的茶樹葉片特寫，葉緣有蟲咬痕與自然斑點，晨露，
+　　　　手持微距淺景深，低飽和綠色，紀實攝影，no text。
+　　　　負向：完美葉片、過度飽和、卡通、插畫。
+　EN: Macro documentary photo of real tea leaves with natural insect bite marks
+　　　and morning dew, handheld shallow depth of field, muted green, no text.
+　　　Negative: perfect leaves, oversaturation, cartoon, illustration.
+　ALT: Close-up of real tea leaves showing natural marks.
+
+【09】Third-Party Tea Test Labs（第三方實驗室）
+　繁中：實驗室門口或走廊的真实一景，玻璃門半開，白色實驗袍掛在鉤上，
+　　　　無人，自然光從側窗進入，淺景深，冷淨灰色調，紀實攝影，
+　　　　no readable sign, no brand。
+　　　　負向：亂碼招牌、霓虹、3D、卡通。
+　EN: Candid documentary shot of a laboratory corridor with a glass door ajar
+　　　and a white lab coat hanging on a hook, no people, daylight from a side
+　　　window, shallow depth of field, clean muted grey, no readable sign, no brand.
+　　　Negative: gibberish signage, neon, 3D, cartoon.
+　ALT: Quiet laboratory corridor with a lab coat on a hook.
+
+【10】Why Tea Fails US Customs（海關扣留）
+　繁中：海關或貨櫃場的真實一景，堆疊貨櫃與檢查人員背影，
+　　　　陰天散射光，貨櫃有使用痕跡與鏽斑，淺景深，灰藍低飽和，
+　　　　紀實攝影，no readable text, no flag close-up。
+　　　　負向：鮮豔國旗特寫、亂碼文字、3D、英雄式打光。
+　EN: Documentary photo at a container terminal, stacked shipping containers and
+　　　an inspector seen from behind, overcast diffused light, real rust and wear,
+　　　shallow depth of field, muted grey-blue, no readable text, no flag close-up.
+　　　Negative: bright flag close-up, gibberish text, 3D, heroic lighting.
+　ALT: Shipping containers at a customs inspection yard.
+
+【11】Organic vs Conventional Tea（有機 vs 常規）
+　素材：主站素材 D（單株茶餅）可用；或生成對比圖。
+　繁中：兩把散茶葉並排放在粗布上，一把色澤較深、一把較淺，
+　　　　自然窗光，茶葉纖維真實可見，淺景深，米灰背景，
+　　　　紀實攝影，no text, no labels。
+　　　　負向：標籤文字、螢光色、3D、對稱證件照。
+　EN: Documentary still life of two small piles of dried tea leaves side by side
+　　　on rough linen, one darker one lighter, natural window light, visible leaf
+　　　fiber, shallow depth of field, beige-grey background, no text, no labels.
+　　　Negative: readable labels, fluorescent color, 3D, centered product shot.
+　ALT: Two styles of dried tea leaves compared on linen.
+
+【12】How Tea Samples Are Tested in EU Labs（採樣到比對）
+　繁中：研究員手持貼有標籤的茶葉樣本瓶，標籤文字模糊不可辨，
+　　　　背景是實驗室檯面與儀器輪廓，中性光，淺景深，真實手套與玻璃，
+　　　　紀實攝影，no readable text, no brand。
+　　　　負向：亂碼文字、霓虹、3D、卡通。
+　EN: Documentary photo of a researcher holding a labeled tea sample vial,
+　　　label text blurred and unreadable, lab bench and instrument silhouettes
+　　　behind, neutral light, shallow depth of field, real gloves and glass,
+　　　no readable text, no brand. Negative: gibberish text, neon, 3D, cartoon.
+　ALT: Researcher holding a labeled tea sample vial in a lab.
+
+【13】US Tea Labeling: Claims You Cannot Make（標籤法律）
+　繁中：真實的茶葉包裝袋與標籤貼紙放在桌上，一隻手正在貼標籤，
+　　　　標籤文字刻意模糊不可辨，自然光，紙張與塑膠材質真實，
+　　　　淺景深，暖灰調，紀實攝影，no readable text, no logos。
+　　　　負向：可辨識商標、亂碼文字、卡通、3D。
+　EN: Candid close-up of a tea pouch and blank label sticker on a desk, a hand
+　　　placing the label, all text deliberately blurred and unreadable, natural
+　　　light, real paper and film textures, shallow depth of field, warm grey,
+　　　no readable text, no logos. Negative: readable trademark, gibberish, cartoon, 3D.
+　ALT: Applying a label to a tea pouch, text unreadable.
+
+【14】When Tea Fails EU Inspection（檢查失敗）
+　繁中：一批茶葉紙箱被貼上封條（文字不可辨）放在倉庫角落，
+　　　　光線偏暗、單一側光，灰塵微粒可見，紀實攝影，淺景深，
+　　　　低飽和，no readable text, no logo。
+　　　　負向：戲劇化打光、鮮豔色、3D、亂碼文字。
+　EN: Documentary photo of tea cartons with a blank paper seal in a quiet
+　　　warehouse corner, dim single side light, visible dust particles, shallow
+　　　depth of field, muted tones, no readable text, no logo.
+　　　Negative: dramatic spotlight, bright colors, 3D, gibberish text.
+　ALT: Sealed cartons of tea in a warehouse.
+
+【15】Pu-erh Storage: Humidity（普洱儲存）
+　素材：主站素材 B（生茶餅）為首選，C（熟茶餅）為對比。
+　新圖提示詞：
+　繁中：傳統倉庫中的普洱茶餅堆疊在木架上，環境潮濕但整潔，
+　　　　空氣中可見微光與粉塵，單一窗光，棉紙紋理真實，
+　　　　淺景深，暖褐色調，紀實攝影，no text。
+　　　　負向：霉斑特寫過度、恐怖感、3D、卡通。
+　EN: Documentary photo of pu-erh tea cakes stacked on a wooden rack in a
+　　　traditional storage room, slightly humid air with dust motes in a single
+　　　window beam, real棉 paper texture, shallow depth of field, warm brown, no text.
+　　　Negative: horror-like mold close-up, 3D, cartoon, oversaturation.
+　ALT: Pu-erh tea cakes stored on wooden shelves.
+
+【16】Heavy Metal Sources in Tea（土壤水源）
+　素材：主站素材 A（茶園）可用。
+　新圖提示詞：
+　繁中：茶園土壤與灌溉水溝的特寫，手指抓起一把濕潤土壤，
+　　　　可見顆粒與根系，自然陰天光，紀實攝影，淺景深，
+　　　　低飽和土褐色，no text。
+　　　　負向：化學燒杯特效、霓虹、3D、卡通。
+　EN: Macro documentary photo of a hand lifting moist soil beside an irrigation
+　　　channel in a tea garden, visible soil grains and tea roots, overcast natural
+　　　light, shallow depth of field, muted earthy brown, no text.
+　　　Negative: chemistry beaker effects, neon, 3D, cartoon.
+　ALT: Hand holding tea garden soil near an irrigation channel.
+
+【17】Tea Prior Notice: FDA（提前申報）
+　繁中：真實的桌面場景——筆電螢幕顯示表單（文字不可辨）、
+　　　　桌上有茶樣與時鐘，自然窗光，手指懸在鍵盤上，
+　　　　淺景深，冷灰暖木混色，紀實攝影，no readable text, no logo。
+　　　　負向：亂碼文字、品牌形象、3D、卡通。
+　EN: Documentary desk scene with a laptop showing an unreadable form, a tea
+　　　sample and a clock nearby, a finger hovering over the keyboard, natural
+　　　window light, shallow depth of field, cool grey and warm wood tones,
+　　　no readable text, no logo. Negative: gibberish text, branding, 3D, cartoon.
+　ALT: Importer filling an advance notice form with a tea sample nearby.
+
+【18】Can Aging Pu-erh Remove Pesticides?（陳化迷思）
+　素材：主站素材 B 或 C（茶餅）為主圖。
+　新圖提示詞：
+　繁中：兩塊普洱茶餅——一塊較新、一塊陳年紙張泛黃，
+　　　　並放在木桌上，舊棉紙有自然斑駁，自然側光，
+　　　　淺景深，暖褐紀實攝影，no text。
+　　　　負向：神奇光暈、特效、3D、卡通。
+　EN: Documentary still life of two pu-erh tea cakes on a wooden table, one
+　　　young and one aged with yellowed, naturally mottled wrapper paper,
+　　　natural side light, shallow depth of field, warm brown, no text.
+　　　Negative: magical glow, special effects, 3D, cartoon.
+　ALT: Young and aged pu-erh tea cakes compared.
+
+【19】Green vs Black Tea Risk（綠茶紅茶）
+　繁中：兩個玻璃杯——一杯清亮黃綠茶湯、一杯琥珀紅茶湯，
+　　　　旁邊放著對應的乾茶葉，自然窗光透過茶湯，
+　　　　真實玻璃反光，淺景深，米色背景，紀實攝影，no text。
+　　　　負向：螢光茶湯、過度飽和、3D、卡通。
+　EN: Documentary photo of two glass cups, one with pale green tea and one with
+　　　amber tea, matching dry leaves beside them, window light passing through
+　　　the liquor, real glass reflections, shallow depth of field, beige background,
+　　　no text. Negative: fluorescent tea, oversaturation, 3D, cartoon.
+　ALT: Green and black tea brewed side by side.
+
+【20】How To Choose Low-Residue Tea Online（選茶指南）
+　素材：主站素材 D 或 B 可用。
+　新圖提示詞：
+　繁中：一雙手在筆電前挑選茶葉，旁邊有茶樣罐與筆記本，
+　　　　真實居家桌面、自然窗光，淺景深，暖色調，
+　　　　紀實攝影，no readable text, no brand。
+　　　　負向：購物網站介面特效、霓虹、3D、亂碼文字。
+　EN: Documentary scene of hands choosing tea in front of a laptop, with sample
+　　　tins and a notebook nearby, real home desk, natural window light, shallow
+　　　depth of field, warm tones, no readable text, no brand.
+　　　Negative: shopping UI effects, neon, 3D, gibberish text.
+　ALT: Buyer comparing tea samples at a desk.
+
+【21】China GB Standard vs EU MRL（標準差異）
+　繁中：桌上並放兩份簡報資料夾（文字不可辨），一份藍色封面一份綠色，
+　　　　中間放著茶葉樣本，自然光，真實紙張材質，淺景深，
+　　　　低飽和紀實攝影，no readable text, no flags。
+　　　　負向：國旗特寫、亂碼文字、3D、卡通。
+　EN: Documentary still life of two folders with blank covers, one blue one green,
+　　　on a desk with a tea sample between them, natural light, real paper texture,
+　　　shallow depth of field, muted documentary tone, no readable text, no flags.
+　　　Negative: flag close-ups, gibberish text, 3D, cartoon.
+　ALT: Two standard documents compared beside a tea sample.
+
+【22】FDA Import Alert: Detention（進口警報）
+　繁中：倉庫中被暫扣的茶葉紙箱，箱子上有空白封條，
+　　　　一名工作人員背影，陰暗單一側光，灰塵微粒，
+　　　　紀實攝影，淺景深，低飽和冷灰，no readable text。
+　　　　（與 #14 構圖不同：此張有人背影、更冷調）
+　　　　負向：戲劇打光、鮮豔、3D、亂碼。
+　EN: Documentary photo of detained tea cartons with blank seals in a warehouse,
+　　　a worker seen from behind, dim single side light, dust particles, shallow
+　　　depth of field, cool muted grey, no readable text.
+　　　Negative: dramatic lighting, bright colors, 3D, gibberish.
+　ALT: Worker inspecting detained tea cartons in a warehouse.
+
+【23】Mycotoxin Risk in Stored Tea（霉菌毒素）
+　繁中：真實倉庫角落的茶葉麻袋，光線昏暗但可見空氣中的粉塵，
+　　　　袋子有自然使用痕跡，牆面斑駁，紀實攝影，淺景深，
+　　　　低飽和暖灰，no text, no horror effect。
+　　　　負向：誇張霉斑、恐怖氛圍、3D、卡通。
+　EN: Documentary photo of tea sacks in a dim storage corner, dust visible in
+　　　the air, naturally worn fabric and mottled wall, shallow depth of field,
+　　　muted warm grey, no text, no horror effect.
+　　　Negative: exaggerated mold, horror mood, 3D, cartoon.
+　ALT: Tea sacks stored in a dim warehouse corner.
+
+【24】EU Default Limit 0.01 mg/kg（0.01 預設值）
+　繁中：一張真實的檢測數據紙條放在桌上，數字以模糊方式呈現不可辨，
+　　　　旁邊放著茶樣與計算器，自然頂光，紙張纖維真實，
+　　　　淺景深，冷灰暖木色调，紀實攝影，no readable numbers。
+　　　　負向：可辨識亂碼数字、霓虹、3D、卡通。
+　EN: Documentary close-up of a printed result slip with numbers blurred and
+　　　unreadable, a tea sample and calculator beside it, soft overhead light,
+　　　real paper fiber, shallow depth of field, cool grey and warm wood,
+　　　no readable numbers. Negative: gibberish numbers, neon, 3D, cartoon.
+　ALT: Blurred test result slip with a tea sample and calculator.
+
+【25】Tea Batch Testing Limits（批次抽樣）
+　繁中：多袋茶葉樣本排成一列，只有其中一袋被貼上空白標記，
+　　　　真實棉布袋與茶葉，自然光從側面，淺景深，
+　　　　暖褐紀實攝影，no readable text。
+　　　　負向：整齊商品照、3D、卡通、過度打光。
+　EN: Documentary still life of several tea sample bags in a row, only one
+　　　tagged with a blank marker, real cloth bags and leaves, side daylight,
+　　　shallow depth of field, warm brown documentary tone, no readable text.
+　　　Negative: tidy product shot, 3D, cartoon, flat lighting.
+　ALT: One tea sample bag marked among several unmarked bags.
+
+【26】Importing to Australia & Canada（澳加標準）
+　繁中：世界地圖局部（澳洲與加拿大）攤開在桌上，上面放著茶樣，
+　　　　手指指向地圖，自然窗光，紙張折痕真實，淺景深，
+　　　　低飽和紀實攝影，no readable text, no flags。
+　　　　負向：可辨識國界文字、霓虹、3D、卡通。
+　EN: Documentary photo of an open paper map showing Australia and Canada on a
+　　　desk with a tea sample on top, a finger pointing at the map, natural window
+　　　light, real paper folds, shallow depth of field, muted documentary tone,
+　　　no readable text, no flags. Negative: readable map labels, neon, 3D, cartoon.
+　ALT: Open map with a tea sample, indicating export markets.
+
+【27】How Retailers Hide Poor Test Results（隱藏檢測結果）
+　繁中：一雙手正在翻過一張茶葉包裝袋，背面朝向鏡頭，
+　　　　背面文字刻意模糊不可辨，桌上有其他包裝，
+　　　　自然側光，真實塑膠反光，淺景深，暖灰調，紀實攝影，
+　　　　no readable text, no brand。
+　　　　負向：可辨識商標、亂碼文字、3D、卡通。
+　EN: Candid documentary photo of hands turning over a tea pouch so its back
+　　　faces the camera, back text deliberately blurred and unreadable, other
+　　　pouches on the desk, natural side light, real film reflections, shallow
+　　　depth of field, warm grey, no readable text, no brand.
+　　　Negative: readable trademark, gibberish, 3D, cartoon.
+　ALT: Tea pouch turned over to show an unreadable back label.
+
+【28】Safe Tea Compliance Checklist（合規清單）
+　素材：主站素材 A（茶園）可作首圖；或生成：
+　繁中：木桌上攤開的記事本（手寫清單不可辨）、茶樣、放大鏡、
+　　　　筆與手套整齊但自然的排列，晨光斜射，淺景深，
+　　　　暖褐低飽和紀實攝影，no readable text, no brand。
+　　　　負向：完美對稱、3D、卡通、過度打光、亂碼文字。
+　EN: Documentary flat-lay of an open notebook with an illegible handwritten
+　　　checklist, a tea sample, magnifying glass, pen and gloves arranged
+　　　naturally on a wooden desk, morning light slanting in, shallow depth of
+　　　field, warm muted brown, no readable text, no brand.
+　　　Negative: perfect symmetry, 3D, cartoon, flat lighting, gibberish.
+　ALT: Compliance checklist notebook with tea sample and Magnifier.
+
+--------------------------------------------------------------------------------
+附錄 A　技術參數與成熟做法
+--------------------------------------------------------------------------------
+
+【尺寸與格式】
+・文章封面：1536×1024（3:2）或 1344×768（16:9），JPG，品質 82，WebP 更佳。
+・Pinterest 圖：1000×1500（2:3）直版。
+・Instagram：1080×1080（1:1）或 1080×1350（4:5）。
+・單圖檔大小建議 < 300 KB（WebP）/ < 500 KB（JPG），避免拖慢 SEO 速度。
+
+【ALT 文字】
+・每張圖都要有意義的 alt，描述畫面本身（上面每篇已附英文 ALT）。
+・不要把關鍵字硬塞進 alt；正確是「這張圖是什麼」。
+
+【其他地方可優化的细节】
+・避免所有圖都同一個光源方向——茶園用晨光、倉庫用單側光、實驗室用中性光。
+・同一系列（如 #15/#18 普洱）保持同一色溫，讀者一看就知道是同一組。
+・不要用「AI 產生」字樣當裝飾——最高級的自然感是讓人以為是紀實攝影。
+
+--------------------------------------------------------------------------------
+附錄 B　檔案命名與上架流程（接入 blog.dazi.uk）
+--------------------------------------------------------------------------------
+
+1. 圖片放置目錄：
+　　F:/Sites/dazi-tea-blog/site/assets/img/
+　（若目錄不存在請建立）
+
+2. 命名規則（全小寫、連字號、與文章 slug 對應）：
+　　<文章slug>.jpg
+　　例：what-are-eu-mrls-for-tea.jpg
+　　直版社群圖：<文章slug>-pin.jpg
+
+3. 在文章 front matter 加 cover 欄位：
+　　---
+　　title: "..."
+　　cover: "/assets/img/what-are-eu-mrls-for-tea.jpg"
+　　cover_alt: "Tea plantation at dawn with mist over rows of tea bushes."
+　　---
+　（build.py 已支援自動讀取 cover / cover_alt，見 scripts/build.py）
+
+4. 重新產生站台：
+　　cd F:/Sites/dazi-tea-blog
+　　python scripts/build.py
+
+5. 社群分發：
+　　social_summary 已存入每篇 front matter，可直接搭配對應的 -pin.jpg 發布到
+　　Pinterest / Instagram。
+
+--------------------------------------------------------------------------------
+附錄 C　主站素材 vs 全新生成 —— 決策建議
+--------------------------------------------------------------------------------
+
+・優先複用主站素材：#1、#8、#11、#15、#16、#18、#20、#28
+　—— 共 8 篇，主站已有合適的真實茶園／茶餅素材，品質一致，不用再花費生成。
+
+・其餘 20 篇：主題偏「檢測、法規、海關、標籤、倉庫」，主站無合適素材，
+　建議用第三部分提示詞生成。若只要做精選，優先做這 6 篇（流量與信任感最高）：
+　　#4 讀檢測報告、#7 重金屬、#9 第三方實驗室、#17 提前申報、
+　　#22 進口警報、#27 隱藏檢測結果。
+
+・如要「最少圖片但覆蓋最大」：先做上述 6 篇 + 主站 8 篇 = 14 篇有圖，
+　其餘 14 篇先用主站素材 A（茶園）作通用背景，之後再補充專圖。
+
+================================================================================
+檔案結束　Need help? 告訴我要不要我直接幫你生成其中幾張樣圖。
+================================================================================
