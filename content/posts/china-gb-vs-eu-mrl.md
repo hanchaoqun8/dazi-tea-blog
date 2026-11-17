@@ -1,4 +1,6 @@
 ---
+cover: "/assets/img/china-gb-vs-eu-mrl.jpg"
+cover_alt: "Two standard documents compared beside a tea sample."
 title: "What Is The Difference Between China GB Standard And EU MRL"
 slug: "china-gb-vs-eu-mrl"
 date: "2026-11-18"
