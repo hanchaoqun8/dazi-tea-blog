@@ -1,4 +1,6 @@
 ---
+cover: "/assets/img/retailers-hide-poor-test-results.jpg"
+cover_alt: "Tea pouch turned over to show an unreadable back label."
 title: "How Retailers Hide Poor Tea Test Results From Consumers"
 slug: "retailers-hide-poor-test-results"
 date: "2026-11-18"
