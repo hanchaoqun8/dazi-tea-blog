@@ -1,4 +1,6 @@
 ---
+cover: "/assets/img/can-aging-puerh-remove-pesticides.jpg"
+cover_alt: "Young and aged pu-erh tea cakes compared."
 title: "Can Aging Pu-erh Remove Pesticide Residues?"
 slug: "can-aging-puerh-remove-pesticides"
 date: "2026-11-18"
