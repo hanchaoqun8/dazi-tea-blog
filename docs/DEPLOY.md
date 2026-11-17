@@ -2,6 +2,29 @@
 
 The site is a pure static site. Cloudflare Pages serves the `site/` directory. The daily workflow deploys automatically. Complete these one-time steps.
 
+## STATUS (2026-11-18 02:20) — what is already DONE
+
+- GitHub repo `hanchaoqun8/dazi-tea-blog` created; all 107 files pushed via REST API
+  (28 articles, 28 cover images in `site/assets/img/`, generated HTML, scripts, docs).
+- Cloudflare Pages project `dazi-tea-blog` **created and deployed** via wrangler.
+  Live preview URL: **https://dazi-tea-blog.pages.dev**
+  Verified: home 200, 28 cover images on home, article pages 200, images 200.
+- 28 articles each have `cover` + `cover_alt`; build.py renders card thumbnails,
+  post cover images and og:image. All 28 validate clean.
+
+### Still manual (token limitations, not code issues)
+1. **Custom domain `blog.dazi.uk`**: the provided CF token has Pages rights but no
+   DNS-record rights (list/add DNS returns 10000 auth error), and the Pages domain API
+   rejected `.uk` with 8000015. In the Cloudflare dashboard: Pages project
+   `dazi-tea-blog` → Custom domains → Set up `blog.dazi.uk` (CF adds the DNS record).
+   Or provide a CF token with `Zone:DNS Edit` for dazi.uk.
+2. **Daily GitHub Actions workflow**: the provided GitHub PAT has only `repo` scope,
+   not `workflow`, so it cannot write `.github/workflows/`. The file is staged at repo
+   root as `daily-post.workflow.yml`; move it to `.github/workflows/daily-post.yml`
+   (or push from a normal git client, where the local copy is already in the right path),
+   then add the CF secrets below. Until then the daily job is NOT running (by design —
+   foundation first, automation after).
+
 ## 0. Activate the automation workflow (one manual step)
 
 The CI workflow file is included in this repo as **`daily-post.workflow.yml`** at the repo root. GitHub's API blocked writing directly into the protected `.github/workflows/` path, so the last step is to move it into place:
