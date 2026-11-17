@@ -1,4 +1,6 @@
 ---
+cover: "/assets/img/common-pesticides-eu-shipment-rejection.jpg"
+cover_alt: "Lab technician using a pipette on a tea sample."
 title: "Common Pesticides That Cause Tea Shipments To Be Rejected In EU"
 slug: "common-pesticides-eu-shipment-rejection"
 date: "2026-11-18"
