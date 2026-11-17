@@ -1,4 +1,6 @@
 ---
+cover: "/assets/img/tea-prior-notice-fda.jpg"
+cover_alt: "Importer filling an advance notice form with a tea sample nearby."
 title: "Tea Prior Notice: FDA Required Notification For Every Shipment"
 slug: "tea-prior-notice-fda"
 date: "2026-11-18"
