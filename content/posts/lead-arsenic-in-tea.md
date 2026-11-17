@@ -1,4 +1,6 @@
 ---
+cover: "/assets/img/lead-arsenic-in-tea.jpg"
+cover_alt: "Tea sample weighed on a laboratory analytical balance."
 title: "Lead and Arsenic In Tea: Risks and Safe Testing Standards"
 slug: "lead-arsenic-in-tea"
 date: "2026-11-18"
