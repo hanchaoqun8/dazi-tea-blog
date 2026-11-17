@@ -1,4 +1,6 @@
 ---
+cover: "/assets/img/what-are-eu-mrls-for-tea.jpg"
+cover_alt: "Tea plantation at dawn with mist over rows of tea bushes."
 title: "What Are EU MRLs for Tea? A Simple Buyer's Guide"
 slug: "what-are-eu-mrls-for-tea"
 date: "2026-11-18"
