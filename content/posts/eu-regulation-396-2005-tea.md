@@ -1,4 +1,6 @@
 ---
+cover: "/assets/img/eu-regulation-396-2005-tea.jpg"
+cover_alt: "Close-up of real tea leaves showing natural marks."
 title: "EU Regulation 396/2005: Tea Pesticide Rules For Chinese Exporters"
 slug: "eu-regulation-396-2005-tea"
 date: "2026-11-18"
