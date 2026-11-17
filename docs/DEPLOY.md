@@ -2,6 +2,16 @@
 
 The site is a pure static site. Cloudflare Pages serves the `site/` directory. The daily workflow deploys automatically. Complete these one-time steps.
 
+## 0. Activate the automation workflow (one manual step)
+
+The CI workflow file is included in this repo as **`daily-post.workflow.yml`** at the repo root. GitHub's API blocked writing directly into the protected `.github/workflows/` path, so the last step is to move it into place:
+
+- On GitHub, open `daily-post.workflow.yml`, copy its full content.
+- Create the file `.github/workflows/daily-post.yml` (via **Add file → Create new file**, typing the full path in the filename box) and paste the content.
+- Delete the root `daily-post.workflow.yml` copy.
+
+The local copy also lives at `.github/workflows/daily-post.yml` in this working folder, so if you push from a normal git client it will already be in the correct location — in that case just delete the root-level `daily-post.workflow.yml` duplicate.
+
 ## 1. Push the code to GitHub
 
 The local machine's git protocol is blocked by a proxy, so push from a normal network, or use the Contents API. From a machine with working GitHub access:
