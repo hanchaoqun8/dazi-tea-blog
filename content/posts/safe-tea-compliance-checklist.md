@@ -1,4 +1,6 @@
 ---
+cover: "/assets/img/safe-tea-compliance-checklist.jpg"
+cover_alt: "Compliance checklist notebook with tea sample and magnifier."
 title: "Checklist: Safe Tea Compliance For EU And US Buyers"
 slug: "safe-tea-compliance-checklist"
 date: "2026-11-18"
