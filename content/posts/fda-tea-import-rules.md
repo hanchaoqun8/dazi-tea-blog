@@ -1,4 +1,6 @@
 ---
+cover: "/assets/img/fda-tea-import-rules.jpg"
+cover_alt: "Tea shipment documents and cartons on a pallet at a port."
 title: "FDA Tea Import Rules: What You Need To Know Before Buying Chinese Tea"
 slug: "fda-tea-import-rules"
 date: "2026-11-18"
