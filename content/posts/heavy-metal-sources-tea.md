@@ -1,4 +1,6 @@
 ---
+cover: "/assets/img/heavy-metal-sources-tea.jpg"
+cover_alt: "Hand holding tea garden soil near an irrigation channel."
 title: "Heavy Metal Sources In Tea Soil, Water And Processing"
 slug: "heavy-metal-sources-tea"
 date: "2026-11-18"
