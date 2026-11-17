@@ -1,4 +1,6 @@
 ---
+cover: "/assets/img/how-tea-samples-tested-eu-labs.jpg"
+cover_alt: "Researcher holding a labeled tea sample vial in a lab."
 title: "How Are Tea Samples Tested For Pesticides In European Labs"
 slug: "how-tea-samples-tested-eu-labs"
 date: "2026-11-18"
