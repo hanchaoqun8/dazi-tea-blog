@@ -1,4 +1,6 @@
 ---
+cover: "/assets/img/fsvp-tea-importers-explained.jpg"
+cover_alt: "Supplier verification documents beside a tea sample tin."
 title: "FSVP For Tea Importers: FDA Supplier Verification Explained"
 slug: "fsvp-tea-importers-explained"
 date: "2026-11-18"
