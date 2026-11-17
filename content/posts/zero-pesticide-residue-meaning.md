@@ -1,4 +1,6 @@
 ---
+cover: "/assets/img/zero-pesticide-residue-meaning.jpg"
+cover_alt: "Inspecting dried tea leaves with a magnifying glass."
 title: "Does 'Zero Pesticide Residue' Mean No Chemicals in Tea?"
 slug: "zero-pesticide-residue-meaning"
 date: "2026-11-18"
