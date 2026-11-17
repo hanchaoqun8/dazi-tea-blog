@@ -1,4 +1,6 @@
 ---
+cover: "/assets/img/why-tea-fails-us-customs.jpg"
+cover_alt: "Shipping containers at a customs inspection yard."
 title: "Why Tea Fails Customs Check In The United States"
 slug: "why-tea-fails-us-customs"
 date: "2026-11-18"
