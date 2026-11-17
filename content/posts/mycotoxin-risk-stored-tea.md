@@ -1,4 +1,6 @@
 ---
+cover: "/assets/img/mycotoxin-risk-stored-tea.jpg"
+cover_alt: "Tea sacks stored in a dim warehouse corner."
 title: "Mycotoxin Risk In Stored Tea: Mold Testing And Prevention"
 slug: "mycotoxin-risk-stored-tea"
 date: "2026-11-18"
