@@ -1,0 +1,38 @@
+/* 哪罕寨本心禪茶 · 博客 + 百科 共用樣式（質樸、留白、淺色）*/
+:root{--bg:#faf8f3;--card:#fffdf8;--ink:#2b2a25;--muted:#6f6c5f;--line:#e7e3d6;--accent:#5b6b4a;--tea:#8a6d3b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Serif TC","Songti TC","SimSun",Georgia,serif;line-height:1.9;font-size:17px}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.top{background:var(--card);border-bottom:1px solid var(--line);padding:16px 5%;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:9}
+.brand{font-size:20px;font-weight:700;color:var(--ink)}
+.brand small{font-size:12px;color:var(--muted);font-weight:400;margin-left:6px}
+nav a{margin-left:18px;font-size:14px;color:var(--muted)}
+nav a.on,nav a:hover{color:var(--accent)}
+.wrap{max-width:900px;margin:0 auto;padding:32px 20px 60px}
+.badge{display:inline-block;background:#eef1e8;color:var(--accent);font-size:12px;padding:3px 10px;border-radius:4px;margin-bottom:12px}
+.hero{padding:24px 28px;background:linear-gradient(135deg,#f3f0e6,#faf8f3);border:1px solid var(--line);border-radius:10px;margin-bottom:32px}
+.hero h1{font-size:30px;margin:0 0 10px;letter-spacing:2px}
+.hero p{margin:0;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;transition:.15s}
+.card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 6px 18px rgba(60,70,50,.07)}
+.card img{width:100%;height:150px;object-fit:cover;display:block}
+.card h2{font-size:19px;margin:16px 16px 8px;line-height:1.5}
+.card p{font-size:14px;color:var(--muted);margin:0 16px 12px;line-height:1.7}
+.card .meta{font-size:12px;color:#9a9688;margin:0 16px 16px}
+.post{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:36px 40px}
+.post h1{font-size:28px;line-height:1.5;letter-spacing:1px;margin:0 0 8px;padding-bottom:18px;border-bottom:2px solid var(--accent)}
+.post h2{font-size:21px;margin:34px 0 12px;color:var(--accent);padding-left:12px;border-left:4px solid #d9dfcd}
+.post h3{font-size:18px;margin:24px 0 10px}
+.post p{margin:12px 0}
+.post ul{padding-left:24px}
+.post li{margin:8px 0}
+.photo{margin:24px 0;text-align:center}
+.photo img{max-width:100%;width:100%;border-radius:8px;display:block}
+.photo figcaption{font-size:13px;color:var(--muted);margin-top:8px;font-style:italic}
+code{background:#f0ede3;padding:1px 5px;border-radius:3px;font-size:.9em}
+.entries{list-style:none;padding:0}
+.entries li{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 18px;margin-bottom:10px}
+.foot{text-align:center;color:var(--muted);font-size:13px;padding:30px 20px;border-top:1px solid var(--line);line-height:2}
+@media(max-width:640px){.wrap{padding:20px 14px 40px}.post{padding:22px 18px}.post h1{font-size:22px}.hero{padding:18px}.hero h1{font-size:24px}body{font-size:16px}}
