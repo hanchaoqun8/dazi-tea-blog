@@ -1,244 +1,211 @@
-#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""雙站靜態生成器：blog.dazi.uk(博客) + wiki.dazi.uk(百科詞條)
+讀取 published/*.md -> 生成 site_blog/ 與 site_wiki/。
+零第三方依賴，Markdown 用簡易解析器。
 """
-Static site generator for blog.dazi.uk — zero third-party dependencies.
-Reads content/posts/*.md with YAML front matter, outputs a clean static site
-into site/ (index, category pages, post pages, sitemap.xml, rss.xml, robots.txt).
-
-Usage:
-    python scripts/build.py
-"""
-import os, re, json, html, shutil, datetime
+import os, re, shutil, html, json
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-POSTS_DIR = os.path.join(ROOT, "content", "posts")
-SITE_DIR = os.path.join(ROOT, "site")
-SITE_URL = "https://blog.dazi.uk"
-SITE_TITLE = "The Tea Ledger"
-SITE_TAGLINE = "Plain-English guides to tea safety, residues and import compliance."
+PUB = os.path.join(ROOT, "published")
+IMG_SRC = os.path.join(ROOT, "images-final")
+SITE_BLOG = os.path.join(ROOT, "site_blog")
+SITE_WIKI = os.path.join(ROOT, "site_wiki")
+BLOG_URL = "https://blog.dazi.uk"
+WIKI_URL = "https://wiki.dazi.uk"
 
-CATEGORY_ORDER = ["EU Rules", "US Import Rules", "Testing & Lab Reports",
-                  "Safety & Storage", "Buying Guide"]
 
-# ---------- minimal front matter parser ----------
-def parse_front_matter(text):
-    meta, body = {}, text
-    m = re.match(r"^---\s*\n(.*?)\n---\s*\n?(.*)$", text, re.S)
-    if not m:
-        return meta, body
-    fm, body = m.group(1), m.group(2)
-    # keys with simple scalar values
-    cur_list_key = None
-    for line in fm.splitlines():
-        if re.match(r"^\s+-\s+", line) and cur_list_key:
-            meta.setdefault(cur_list_key, []).append(line.strip()[2:].strip().strip('"'))
-            continue
-        cur_list_key = None
-        mm = re.match(r"^([A-Za-z_]+):\s*(.*)$", line)
-        if not mm:
-            continue
-        key, val = mm.group(1), mm.group(2).strip()
-        if val == "":
-            meta[key] = []
-            cur_list_key = key
-        elif val.startswith("["):
-            inner = val.strip("[] ")
-            meta[key] = [x.strip().strip('"') for x in re.split(r",(?![^\[]*\])", inner) if x.strip()]
-        else:
-            meta[key] = val.strip('"')
+def parse_md(path):
+    txt = open(path, encoding="utf-8").read()
+    meta = {}
+    body = txt
+    m = re.match(r"^---\s*\n(.*?)\n---\s*\n(.*)$", txt, re.S)
+    if m:
+        fm, body = m.group(1), m.group(2)
+        for line in fm.splitlines():
+            if ":" in line:
+                k, v = line.split(":", 1)
+                meta[k.strip()] = v.strip().strip('"').strip("'")
     return meta, body
 
-# ---------- tiny markdown renderer (headings, lists, links, bold, code, paragraphs) ----------
-def inline_md(s):
-    s = html.escape(s, quote=False)
-    s = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r'<a href="\2">\1</a>', s)
-    s = re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", s)
-    s = re.sub(r"`([^`]+)`", r"<code>\1</code>", s)
-    s = re.sub(r"(?<![\w/])((?:https?://)[^\s<)]+)", r'<a href="\1" rel="nofollow">\1</a>', s)
+
+def inline(s):
+    s = html.escape(s)
+    s = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", s)
+    s = re.sub(r"`(.+?)`", r"<code>\1</code>", s)
     return s
 
-def render_markdown(md):
-    lines = md.splitlines()
-    out, i, n = [], 0, len(lines)
-    while i < n:
-        line = lines[i].rstrip()
-        if not line.strip():
-            i += 1; continue
-        mh = re.match(r"^(#{1,6})\s+(.*)$", line)
-        if mh:
-            lvl = len(mh.group(1)); txt = inline_md(mh.group(2))
-            out.append(f"<h{lvl}>{txt}</h{lvl}>"); i += 1; continue
-        # bullet / numbered list
-        if re.match(r"^\s*[-*]\s+", line) or re.match(r"^\s*\d+\.\s+", line):
-            ordered = bool(re.match(r"^\s*\d+\.\s+", line))
-            tag = "ol" if ordered else "ul"
-            items = []
-            while i < n and (re.match(r"^\s*[-*]\s+", lines[i]) or re.match(r"^\s*\d+\.\s+", lines[i])):
-                item = re.sub(r"^\s*(?:[-*]|\d+\.)\s+", "", lines[i]).rstrip()
-                items.append(f"<li>{inline_md(item)}</li>"); i += 1
-            out.append(f"<{tag}>" + "".join(items) + f"</{tag}>"); continue
-        if line.startswith(">"):
-            quote = []
-            while i < n and lines[i].startswith(">"):
-                quote.append(lines[i].lstrip("> ").rstrip()); i += 1
-            out.append("<blockquote>" + inline_md(" ".join(quote)) + "</blockquote>"); continue
-        # paragraph
-        para = [line]
-        i += 1
-        while i < n and lines[i].strip() and not re.match(r"^(#{1,6})\s", lines[i]) \
-              and not re.match(r"^\s*[-*]\s+", lines[i]) and not re.match(r"^\s*\d+\.\s+", lines[i]) \
-              and not lines[i].startswith(">"):
-            para.append(lines[i].rstrip()); i += 1
-        out.append("<p>" + inline_md(" ".join(para)) + "</p>")
+
+def md_to_html(body):
+    lines = body.splitlines()
+    out, para, in_ul = [], [], False
+
+    def flush():
+        nonlocal para
+        if para:
+            out.append("<p>" + inline(" ".join(para)) + "</p>")
+            para = []
+
+    for ln in lines:
+        t = ln.strip()
+        if not t:
+            flush(); continue
+        if t.startswith("【配圖："):
+            flush()
+            mm = re.match(r"【配圖：([^】]+)】\s*(.*)", t)
+            if mm:
+                f = mm.group(1).split("/")[-1]
+                cap = mm.group(2).strip()
+                out.append(
+                    f'<figure class="photo"><img src="/assets/img/{f}" alt="{html.escape(cap)}" loading="lazy">'
+                    + (f"<figcaption>{inline(cap)}</figcaption>" if cap else "") + "</figure>")
+            continue
+        if t.startswith("### "):
+            flush(); out.append("<h3>" + inline(t[4:]) + "</h3>"); continue
+        if t.startswith("## "):
+            flush(); out.append("<h2>" + inline(t[3:]) + "</h2>"); continue
+        if t.startswith("# "):
+            flush(); out.append("<h1>" + inline(t[2:]) + "</h1>"); continue
+        if re.match(r"^\d+[\.、]\s", t) or t.startswith("- "):
+            if not in_ul:
+                flush(); out.append("<ul>"); in_ul = True
+            item = re.sub(r"^\d+[\.、]\s*", "", t)
+            item = re.sub(r"^-\s*", "", item)
+            out.append("<li>" + inline(item) + "</li>")
+            continue
+        if in_ul:
+            out.append("</ul>"); in_ul = False
+        para.append(t)
+    flush()
+    if in_ul:
+        out.append("</ul>")
     return "\n".join(out)
 
-# ---------- page templates ----------
-def layout(title, description, content, body_class="", og_image=""):
-    og_img_tag = f'<meta property="og:image" content="{html.escape(og_image)}">' if og_image else ""
+
+def seo_desc(meta):
+    d = meta.get("description", "")
+    return d[:160]
+
+
+def layout(title, desc, content, site_url, is_wiki=False, cover=""):
+    og = f'<meta property="og:image" content="{site_url}/assets/img/{cover.split("/")[-1]}">' if cover else ""
+    wiki_badge = '<span class="badge">百科詞條</span>' if is_wiki else ""
     return f"""<!DOCTYPE html>
-<html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="zh-Hant"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{html.escape(title)}</title>
-<meta name="description" content="{html.escape(description)}">
+<meta name="description" content="{html.escape(desc)}">
 <meta property="og:title" content="{html.escape(title)}">
-<meta property="og:description" content="{html.escape(description)}">
-<meta property="og:type" content="website">
-<meta property="og:url" content="{SITE_URL}/">
-{og_img_tag}
+<meta property="og:description" content="{html.escape(desc)}">
+<meta property="og:type" content="article">
+<meta property="og:url" content="{site_url}/">
+{og}
 <link rel="stylesheet" href="/assets/style.css">
-<link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
-</head><body class="{body_class}">
-<header class="site-head"><div class="wrap">
-  <a class="brand" href="/">{SITE_TITLE}</a>
-  <nav><a href="/">All guides</a> <a href="/sitemap.xml">Sitemap</a> <a href="/rss.xml">RSS</a></nav>
-</div></header>
-<main class="wrap">{content}</main>
-<footer class="site-foot"><div class="wrap">
-  <p>{SITE_TITLE} — {SITE_TAGLINE}</p>
-  <p class="muted">Independent buyer education. Not affiliated with any regulator or seller. No health claims.</p>
-</div></footer>
+</head><body>
+<header class="top"><a class="brand" href="/">哪罕寨原生茶 <small>{'百科' if is_wiki else '本心禪茶博客'}</small></a>
+<nav><a href="/">首頁</a> <a href="{BLOG_URL}" {'class="on" ' if not is_wiki else ''}>博客</a> <a href="{WIKI_URL}" {'class="on" ' if is_wiki else ''}>百科詞條</a></nav></header>
+<main class="wrap">{wiki_badge}{content}</main>
+<footer class="foot">雲南景東大街鄉 · 哪罕寨｜守一方茶園，守一顆本心。<br>
+<a href="{BLOG_URL}">blog.dazi.uk</a> · <a href="{WIKI_URL}">wiki.dazi.uk</a></footer>
 </body></html>"""
 
-def load_posts():
-    posts = []
-    for fn in os.listdir(POSTS_DIR):
-        if not fn.endswith(".md"): continue
-        with open(os.path.join(POSTS_DIR, fn), "r", encoding="utf-8") as f:
-            text = f.read()
-        meta, body = parse_front_matter(text)
-        if not meta.get("slug") or not meta.get("title"):
-            print("SKIP (missing slug/title):", fn); continue
-        posts.append({"meta": meta, "body": body,
-                      "date": meta.get("date", "2026-11-18")})
-    posts.sort(key=lambda p: p["date"], reverse=True)
-    return posts
 
-def cat_slug(c):
-    return re.sub(r"[^a-z0-9]+", "-", c.lower()).strip("-")
-
-def build():
-    # Overwrite in place instead of rmtree: safe on sandboxes and preview-locked dirs.
-    os.makedirs(SITE_DIR, exist_ok=True)
-    os.makedirs(os.path.join(SITE_DIR, "assets"), exist_ok=True)
-    # ensure style copied from source location (docs/source kept in scripts dir too)
+def ensure_assets(site_dir):
+    adir = os.path.join(site_dir, "assets")
+    os.makedirs(adir, exist_ok=True)
     src_css = os.path.join(ROOT, "scripts", "style.css")
-    if os.path.exists(src_css):
-        shutil.copy(src_css, os.path.join(SITE_DIR, "assets", "style.css"))
+    shutil.copy2(src_css, os.path.join(adir, "style.css"))
+    idir = os.path.join(adir, "img")
+    os.makedirs(idir, exist_ok=True)
+    for f in os.listdir(IMG_SRC):
+        if f.lower().endswith(".jpg"):
+            shutil.copy2(os.path.join(IMG_SRC, f), os.path.join(idir, f))
 
-    posts = load_posts()
-    # group by category
-    cats = {}
-    for p in posts:
-        c = p["meta"].get("category", "Buying Guide")
-        cats.setdefault(c, []).append(p)
 
-    # home
+def build_blog(posts):
+    for d in [SITE_BLOG]:
+        os.makedirs(d, exist_ok=True)
+    ensure_assets(SITE_BLOG)
+    # 首頁
     cards = []
     for p in posts:
         m = p["meta"]
+        slug = m.get("slug") or p["slug"]
         cover = m.get("cover", "")
-        cover_alt = m.get("cover_alt", m.get("title", ""))
-        thumb = (f'<img class="card-img" src="{html.escape(cover)}" alt="{html.escape(cover_alt)}" loading="lazy">' if cover else "")
+        img = f'<img src="/assets/img/{cover.split("/")[-1]}" alt="{html.escape(m.get("image_caption",""))}" loading="lazy">' if cover else ""
         cards.append(f"""<article class="card">
-  {thumb}
-  <div class="card-cat">{html.escape(m.get('category',''))}</div>
-  <h2><a href="/posts/{m['slug']}/">{html.escape(m['title'])}</a></h2>
-  <p>{html.escape(m.get('description',''))}</p>
-  <div class="card-meta">{p['date']}</div>
+  {img}
+  <h2><a href="/posts/{slug}/">{html.escape(m.get('title',''))}</a></h2>
+  <p>{html.escape(m.get('description',''))[:110]}…</p>
+  <div class="meta">{html.escape(m.get('date',''))} · 哪罕寨茶農手記</div>
 </article>""")
-    nav_cats = " ".join(f'<a href="/category/{cat_slug(c)}/">{html.escape(c)}</a>' for c in CATEGORY_ORDER if c in cats)
-    home = layout(SITE_TITLE, SITE_TAGLINE, f"""
-<section class="hero"><h1>{SITE_TITLE}</h1><p>{SITE_TAGLINE}</p>
-<p class="lede">Clear, no-nonsense guides for tea drinkers and small importers on EU and US rules, pesticide MRLs, heavy metals, lab reports and how to spot a good supplier. Safety and compliance only — no health claims.</p>
-<div class="catnav">{nav_cats}</div></section>
-<section class="grid">{''.join(cards)}</section>""")
-    with open(os.path.join(SITE_DIR, "index.html"), "w", encoding="utf-8") as f:
-        f.write(home)
-
-    # category pages
-    for c, plist in cats.items():
-        items = []
-        for p in plist:
-            m = p["meta"]
-            items.append(f"""<article class="card"><h2><a href="/posts/{m['slug']}/">{html.escape(m['title'])}</a></h2>
-<p>{html.escape(m.get('description',''))}</p><div class="card-meta">{p['date']}</div></article>""")
-        content = f"""<section class="hero"><h1>{html.escape(c)}</h1>
-<p><a href="/">← All guides</a></p></section><section class="grid">{''.join(items)}</section>"""
-        d = os.path.join(SITE_DIR, "category", cat_slug(c))
-        os.makedirs(d, exist_ok=True)
-        with open(os.path.join(d, "index.html"), "w", encoding="utf-8") as f:
-            f.write(layout(f"{c} — {SITE_TITLE}", f"{c} guides on {SITE_TITLE}.", content))
-
-    # post pages
+    home = layout("哪罕寨原生茶｜本心禪茶博客",
+                  "雲南景東哀牢山哪罕寨，一位茶農的真實記錄。不炒山頭、不玩金融茶，只做老百姓喝得起的原生良心茶。",
+                  '<section class="hero"><h1>回歸茶的本心</h1><p>守哀牢山一方茶園，守茶農一顆本心。不逐浮名、不隨炒作、不貪暴利，只做一杯樸實、乾淨、老百姓喝得起的原生良心茶。</p></section>'
+                  + '<div class="grid">' + "".join(cards) + "</div>", BLOG_URL)
+    open(os.path.join(SITE_BLOG, "index.html"), "w", encoding="utf-8").write(home)
+    # 文章頁
     for p in posts:
-        m = p["meta"]; slug = m["slug"]
-        body_html = render_markdown(p["body"])
-        # remove the H1 from body if present (we render it ourselves)
-        body_html = re.sub(r"<h1>.*?</h1>", "", body_html, count=1)
-        tags = " ".join(f'<span class="tag">{html.escape(t)}</span>' for t in m.get("tags", []))
-        cover = m.get("cover", "")
-        cover_alt = m.get("cover_alt", m.get("title", ""))
-        cover_html = (f'<figure class="post-cover"><img src="{html.escape(cover)}" alt="{html.escape(cover_alt)}"></figure>' if cover else "")
-        content = f"""<article class="post">
-<div class="post-cat">{html.escape(m.get('category',''))} · {p['date']}</div>
-<h1>{html.escape(m['title'])}</h1>
-<div class="tags">{tags}</div>
-{cover_html}
-<div class="post-body">{body_html}</div>
-</article>"""
-        d = os.path.join(SITE_DIR, "posts", slug)
-        os.makedirs(d, exist_ok=True)
-        og = (SITE_URL + cover) if cover.startswith("/") else cover
-        with open(os.path.join(d, "index.html"), "w", encoding="utf-8") as f:
-            f.write(layout(m["title"], m.get("description", ""), content, "post-page", og_image=og))
-
-    # sitemap
-    urls = [SITE_URL + "/"] + [SITE_URL + "/category/" + cat_slug(c) + "/" for c in cats] \
-           + [SITE_URL + "/posts/" + p["meta"]["slug"] + "/" for p in posts]
-    sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-    for u in urls:
-        sm += f"\n  <url><loc>{u}</loc></url>"
-    sm += "\n</urlset>"
-    with open(os.path.join(SITE_DIR, "sitemap.xml"), "w", encoding="utf-8") as f:
-        f.write(sm)
-
-    # rss
-    items = []
-    for p in posts[:30]:
         m = p["meta"]
-        items.append(f"""<item><title>{html.escape(m['title'])}</title>
-<link>{SITE_URL}/posts/{m['slug']}/</link>
-<guid>{SITE_URL}/posts/{m['slug']}/</guid>
-<description>{html.escape(m.get('description',''))}</description></item>""")
-    rss = f"""<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel>
-<title>{SITE_TITLE}</title><link>{SITE_URL}</link><description>{SITE_TAGLINE}</description>
-{''.join(items)}</channel></rss>"""
-    with open(os.path.join(SITE_DIR, "rss.xml"), "w", encoding="utf-8") as f:
-        f.write(rss)
+        slug = m.get("slug") or p["slug"]
+        body = md_to_html(p["body"])
+        content = f'<article class="post">{body}</article>'
+        page = layout(m.get("title", ""), seo_desc(m), content, BLOG_URL, cover=m.get("cover", ""))
+        pd = os.path.join(SITE_BLOG, "posts", slug)
+        os.makedirs(pd, exist_ok=True)
+        open(os.path.join(pd, "index.html"), "w", encoding="utf-8").write(page)
+    # sitemap
+    urls = [BLOG_URL + "/"] + [BLOG_URL + "/posts/" + (m.get("slug") or p["slug"]) + "/" for p in posts for m in [p["meta"]]]
+    open(os.path.join(SITE_BLOG, "sitemap.xml"), "w", encoding="utf-8").write(
+        '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        + "".join(f"<url><loc>{u}</loc></url>" for u in urls) + "</urlset>")
+    open(os.path.join(SITE_BLOG, "robots.txt"), "w", encoding="utf-8").write(
+        "User-agent: *\nAllow: /\nSitemap: " + BLOG_URL + "/sitemap.xml\n")
+    return len(posts)
 
-    with open(os.path.join(SITE_DIR, "robots.txt"), "w", encoding="utf-8") as f:
-        f.write(f"User-agent: *\nAllow: /\n\nSitemap: {SITE_URL}/sitemap.xml\n")
 
-    print(f"Built {len(posts)} posts, {len(cats)} categories -> {SITE_DIR}")
+def build_wiki(posts):
+    os.makedirs(SITE_WIKI, exist_ok=True)
+    ensure_assets(SITE_WIKI)
+    cards = []
+    for p in posts:
+        m = p["meta"]
+        slug = m.get("slug") or p["slug"]
+        cards.append(f'<li><a href="/entries/{slug}/">{html.escape(m.get("title",""))}</a> — {html.escape(m.get("description",""))[:70]}…</li>')
+    home = layout("哪罕寨原生茶 · 百科詞條",
+                  "哪罕寨、景東哀牢山原生茶的客觀百科記錄：產地風土、茶樹品種、初製工藝、茶園生態。",
+                  '<section class="hero"><h1>哪罕寨原生茶 · 百科詞條</h1><p>客觀、乾淨、專業的詞條式記錄：產地、茶樹、工藝、生態。適合茶友查閱，亦供百科站的詞條收錄。</p></section>'
+                  + '<ul class="entries">' + "".join(cards) + "</ul>", WIKI_URL, is_wiki=True)
+    open(os.path.join(SITE_WIKI, "index.html"), "w", encoding="utf-8").write(home)
+    for p in posts:
+        m = p["meta"]
+        slug = m.get("slug") or p["slug"]
+        body = md_to_html(p["body"])
+        page = layout(m.get("title", ""), seo_desc(m), f'<article class="post wiki-entry">{body}</article>',
+                      WIKI_URL, is_wiki=True, cover=m.get("cover", ""))
+        ed = os.path.join(SITE_WIKI, "entries", slug)
+        os.makedirs(ed, exist_ok=True)
+        open(os.path.join(ed, "index.html"), "w", encoding="utf-8").write(page)
+    urls = [WIKI_URL + "/"] + [WIKI_URL + "/entries/" + (m.get("slug") or p["slug"]) + "/" for p in posts for m in [p["meta"]]]
+    open(os.path.join(SITE_WIKI, "sitemap.xml"), "w", encoding="utf-8").write(
+        '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        + "".join(f"<url><loc>{u}</loc></url>" for u in urls) + "</urlset>")
+    open(os.path.join(SITE_WIKI, "robots.txt"), "w", encoding="utf-8").write(
+        "User-agent: *\nAllow: /\nSitemap: " + WIKI_URL + "/sitemap.xml\n")
+    return len(posts)
+
+
+def main():
+    posts = []
+    for f in sorted(os.listdir(PUB)):
+        if f.endswith(".md"):
+            meta, body = parse_md(os.path.join(PUB, f))
+            posts.append({"slug": f[:-3], "meta": meta, "body": body})
+    posts.sort(key=lambda p: p["meta"].get("date", ""), reverse=True)
+    nb = build_blog(posts)
+    nw = build_wiki(posts)
+    print(f"[build] blog posts={nb} -> {SITE_BLOG}")
+    print(f"[build] wiki entries={nw} -> {SITE_WIKI}")
+
 
 if __name__ == "__main__":
-    build()
+    main()
