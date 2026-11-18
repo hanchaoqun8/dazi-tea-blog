@@ -1,70 +1,81 @@
-#!/usr/bin/env python3
-"""Validate all posts against hard rules. Reports problems; exits 1 if any blocking issue."""
+# -*- coding: utf-8 -*-
+"""文章合格性校验：繁体、结构、禁令、配图存在性、字数。"""
 import os, re, sys
+from opencc import OpenCC
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-POSTS = os.path.join(ROOT, "content", "posts")
-# An actual promotional health claim = tea/product + efficacy verb + disease/body-function,
-# stated positively. Legal quotations ("intended to diagnose, cure, mitigate, treat or
-# prevent disease") and the ordinary verb "treat X as Y" are NOT claims.
-PROMO_CLAIM = re.compile(
-    r"\b(?:drinking\s+)?(?:this\s+)?tea\b[^.]{0,60}\b(?:cures?|heals?|treats?|prevents?|reverses?|alleviates?)\b[^.]{0,60}\b(?:diseases?|cancer|illness|diabetes|hypertension|infection)\b"
-    r"|\b(?:boosts?|strengthens?)\s+(?:your\s+)?immune\s+system\b"
-    r"|\b(?:aids?|helps?\s+with|causes?)\s+weight\s+loss\b"
-    r"|\b(?:lowers?|reduces?)\s+blood\s+pressure\b"
-    r"|\banti-?cancer\b"
-    r"|\bdetoxif(?:ies|y|ying|ication)\b"
-    r"|\breduces?\s+inflammation\b", re.I)
-# Lines that are clear legal / negation context are exempt from the promo scan.
-LEGAL_OR_NEG = re.compile(r"\b(do not|don't|must not|cannot|can't|never|prohibit\w*|illegal|unapproved|unlawful|claim\w*|FD&C|drug|intended use|diagnose|mitigate|structure or any function|marketing phrase|not a)\b", re.I)
-INVENTED_NUM = re.compile(r"(EU|FDA|China|GB)\s*(lead|arsenic|residue|MRL)\s*(limit|level)?\s*(is|of|:)?\s*0?\.\d+\s*mg/kg", re.I)
+PUB = os.path.join(ROOT, "published")
+IMGF = os.path.join(ROOT, "images-final")
+s2t = OpenCC("s2t")
+t2s = OpenCC("t2s")
 
-def promo_hits(text):
-    hits = []
-    for line in text.splitlines():
-        if PROMO_CLAIM.search(line) and not LEGAL_OR_NEG.search(line):
-            hits.append(line.strip()[:120])
-    return hits
+BANNED = ["頂級", "天花板", "神茶", "名貴", "稀缺", "降血壓", "減肥", "排毒", "抗癌", "增強免疫力", "理財茶"]
+# 這些詞僅在「肯定/推薦」語境才違規；在「不碰/不炒/反對」批判語境屬合法表態
+CONTEXT_BANNED = ["投資茶", "保值茶", "金融茶"]
+CRITIQUE_MARKERS = ["不碰", "不玩", "不炒", "不鼓勵", "從不", "反對", "不做", "不搞"]
+# 繁簡同形/異體字，OpenCC 會誤判，加入白名單（這些字在繁體中亦通用）
+VARIANT_OK = {"峰": "峯", "干": "幹", "欲": "慾", "里": "裡", "后": "后"}
+REQUIRED_H2 = ["一、產地真實風土", "二、茶農做茶本心", "三、禪茶一味", "四、百姓日常飲茶真義"]
+REQUIRED_FM = ["title", "slug", "date", "description", "keywords", "cover", "image_caption"]
 
-problems = []
-files = sorted(f for f in os.listdir(POSTS) if f.endswith(".md"))
-slugs = set()
-for fn in files:
-    txt = open(os.path.join(POSTS, fn), encoding="utf-8").read()
-    def chk(cond, msg):
-        if not cond: problems.append(f"{fn}: {msg}")
-    m = re.match(r"^---\s*\n(.*?)\n---\s*\n", txt, re.S)
-    chk(bool(m), "missing front matter")
-    fm = m.group(1) if m else ""
-    sm = re.search(r"^slug:\s*[\"']?([^\"'\n]+)", fm, re.M)
-    chk(bool(sm), "missing slug")
-    if sm:
-        slug = sm.group(1).strip()
-        chk(slug not in slugs, f"duplicate slug {slug}")
-        slugs.add(slug)
-        chk(slug + ".md" == fn, f"slug '{slug}' != filename '{fn}'")
-    for field in ["title:", "date:", "category:", "tags:", "description:", "social_summary:", "sources:"]:
-        chk(field in fm, f"front matter missing {field}")
-    ds = re.search(r"^description:\s*[\"']?(.*?)[\"']?$", fm, re.M)
-    if ds: chk(len(ds.group(1).strip('"')) <= 165, f"description too long ({len(ds.group(1))})")
-    ss = re.search(r"^social_summary:\s*[\"']?(.*?)[\"']?$", fm, re.M)
-    if ss: chk(len(ss.group(1).strip('"')) <= 245, f"social_summary too long ({len(ss.group(1))})")
-    chk(len(re.findall(r"^# ", txt, re.M)) <= 1, "more than one H1")
-    chk("## Sources" in txt or "Sources & further" in txt, "no sources section")
-    chk("Related reading" in txt or "Related Read" in txt, "no related reading")
-    rels = re.findall(r"/posts/([a-z0-9-]+)/", txt)
-    chk(len(rels) >= 2, f"too few internal links ({len(rels)})")
-    for r in rels:
-        chk(r + ".md" in files or r in ("what-are-eu-mrls-for-tea",), f"dangling internal link: {r}")
-    hits = promo_hits(txt)
-    chk(not hits, "promotional health claim found: " + (hits[0] if hits else ""))
-    chk(not INVENTED_NUM.search(txt), "possible invented numeric limit")
-    wc = len(txt.split())
-    chk(wc >= 800, f"too short ({wc} words)")
 
-print(f"Checked {len(files)} posts.")
-if problems:
-    print(f"\n{len(problems)} PROBLEM(S):")
-    for p in problems: print("  !", p)
-    sys.exit(1)
-else:
-    print("ALL CHECKS PASSED")
+def check(path):
+    errs, warns = [], []
+    txt = open(path, encoding="utf-8").read()
+    fn = os.path.basename(path)
+    # 繁体检测：把简体字转繁体后若与原文差异大 => 含简体
+    conv = s2t.convert(txt)
+    # 忽略标点/空白差异，只比较汉字；逐字符找被转换的简字
+    simplified = []
+    for a, b in zip(txt, conv):
+        if a != b and "\u4e00" <= a <= "\u9fff" and "\u4e00" <= b <= "\u9fff":
+            if a in VARIANT_OK: continue
+            simplified.append(f"{a}->{b}")
+    if simplified:
+        errs.append("簡體字: " + " ".join(sorted(set(simplified))[:25]))
+    # front matter
+    m = re.match(r"^---\s*\n(.*?)\n---\s*\n(.*)$", txt, re.S)
+    if not m:
+        errs.append("缺少 front matter"); return errs, warns
+    fm, body = m.group(1), m.group(2)
+    for k in REQUIRED_FM:
+        if not re.search(rf"^{k}:", fm, re.M): errs.append(f"缺 front matter 欄位 {k}")
+    # 字数（中文字符）
+    words = len(re.findall(r"[\u4e00-\u9fff]", body))
+    if not (750 <= words <= 1250): warns.append(f"字數 {words}（目標800-1100）")
+    for h in REQUIRED_H2:
+        if h not in body: errs.append(f"缺章節 {h}")
+    if "常見問題" not in body and "FAQ" not in body: errs.append("缺 FAQ")
+    if "配圖" not in body: warns.append("無配圖佔位")
+    # 禁令（绝对词）
+    for b in BANNED:
+        if b in txt: errs.append(f"禁用詞 [{b}]")
+    # 語境詞：整句含批判標記才合法
+    for line in body.splitlines():
+        for b in CONTEXT_BANNED:
+            if b in line and not any(mk in line for mk in CRITIQUE_MARKERS):
+                errs.append(f"禁用詞(非批判語境) [{b}] :: {line.strip()[:40]}")
+    if "哪罕村" in body: errs.append("出現禁用地名 哪罕村")
+    # 配图存在
+    covers = re.findall(r"images-final/([A-Za-z0-9_-]+\.jpg)", txt)
+    for c in covers:
+        if not os.path.exists(os.path.join(IMGF, c)): errs.append(f"配圖不存在 {c}")
+    warns.insert(0, f"正文約{words}字, 配圖{len(set(covers))}張")
+    return errs, warns
+
+
+def main():
+    total_err = 0
+    for f in sorted(os.listdir(PUB)):
+        if not f.endswith(".md"): continue
+        errs, warns = check(os.path.join(PUB, f))
+        print(f"\n=== {f} ===")
+        for w in warns: print("  i", w)
+        for e in errs: print("  X", e); total_err += 1
+        if not errs: print("  OK 通過")
+    print(f"\n[validate] 錯誤總數={total_err}")
+    return total_err
+
+
+if __name__ == "__main__":
+    sys.exit(1 if main() else 0)
